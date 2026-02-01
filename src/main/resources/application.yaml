@@ -20,3 +20,13 @@ cbs:
   base-url: http://localhost:8080
   mock:
     enabled: true
+
+instapay:
+  base-url: http://localhost:8081
+  mock:
+    enabled: true
+
+pesonet:
+  base-url: http://localhost:8082
+  mock:
+    enabled: true

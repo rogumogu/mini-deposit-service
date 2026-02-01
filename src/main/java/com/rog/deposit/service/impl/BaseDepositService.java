@@ -1,7 +1,7 @@
 package com.rog.deposit.service.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.rog.deposit.client.CoreBankingService;
+import com.rog.deposit.client.CoreBankingClient;
 import com.rog.deposit.dto.DepositRequest;
 import com.rog.deposit.dto.DepositResponse;
 import com.rog.deposit.dto.cbs.CbsResponse;
@@ -20,7 +20,7 @@ public abstract class BaseDepositService implements DepositService {
 
     protected DepositCommandService depositCommandService;
     protected ObjectMapper objectMapper;
-    protected CoreBankingService coreBankingService;
+    protected CoreBankingClient coreBankingService;
 
     @Override
     public DepositResponse createDeposit(String transactionId, String idempotencyKey, String channel, DepositRequest request) {
@@ -74,7 +74,7 @@ public abstract class BaseDepositService implements DepositService {
     }
 
     @Autowired
-    public void setCoreBankingService(CoreBankingService coreBankingService) {
+    public void setCoreBankingService(CoreBankingClient coreBankingService) {
         this.coreBankingService = coreBankingService;
     }
 

@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 @Slf4j
 @Component
 @ConditionalOnProperty(name = "cbs.mock.enabled", havingValue = "true")
-public class MockCoreBankingService implements CoreBankingService {
+public class MockCoreBankingClient implements CoreBankingClient {
 
     @Override
     public CbsResponse withdraw(WithdrawalCbsRequest request) {
