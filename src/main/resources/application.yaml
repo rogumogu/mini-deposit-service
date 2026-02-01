@@ -1,14 +1,25 @@
 spring:
   application:
     name: mini-deposit-service
+  datasource:
+    url: jdbc:postgresql://localhost:5432/deposit_db
+    username: postgres
+    password: postgres
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
 
 server:
   port: 2056
 
 channel-properties:
   intrabank:
-    service: IntrabankService
+    service: intrabankServiceImpl
   instapay:
-    service: InstapayService
+    service: instapayServiceImpl
   pesonet:
-    service: PesonetService
+    service: pesonetServiceImpl
