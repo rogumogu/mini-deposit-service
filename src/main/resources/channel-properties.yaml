@@ -1,0 +1,7 @@
+channel-properties:
+  intrabank:
+    service: intrabankServiceImpl
+  instapay:
+    service: instapayServiceImpl
+  pesonet:
+    service: pesonetServiceImpl

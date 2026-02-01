@@ -1,129 +1,97 @@
 package com.rog.deposit.exception;
 
-import com.rog.deposit.dto.ErrorResponse;
+import com.rog.deposit.config.ErrorCodeProperties;
+import com.rog.deposit.config.ErrorResponse;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MissingRequestHeaderException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.context.request.WebRequest;
-
-import java.time.LocalDateTime;
 
 @Slf4j
 @ControllerAdvice
+@RequiredArgsConstructor
 public class GlobalExceptionHandler {
 
+    private final ErrorCodeProperties errorCodeProperties;
+
     @ExceptionHandler(DepositNotFoundException.class)
-    public ResponseEntity<ErrorResponse> handleDepositNotFoundException(
-            DepositNotFoundException ex, WebRequest request) {
+    public ResponseEntity<ErrorResponse> handleDepositNotFoundException(DepositNotFoundException ex) {
         log.error("Deposit not found: {}", ex.getMessage());
         
-        ErrorResponse errorResponse = ErrorResponse.builder()
-                .timestamp(LocalDateTime.now())
-                .status(HttpStatus.NOT_FOUND.value())
-                .error(HttpStatus.NOT_FOUND.getReasonPhrase())
-                .message(ex.getMessage())
-                .path(request.getDescription(false).replace("uri=", ""))
-                .build();
+        ErrorResponse errorResponse = errorCodeProperties.get("DepositNotFoundException").copy();
+        if (ex.getMessage() != null && !ex.getMessage().isEmpty()) {
+            errorResponse.setErrorReason(ex.getMessage());
+        }
         
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
+        return errorResponse.toResponseEntity();
     }
 
     @ExceptionHandler(DuplicateTransactionException.class)
-    public ResponseEntity<ErrorResponse> handleDuplicateTransactionException(
-            DuplicateTransactionException ex, WebRequest request) {
+    public ResponseEntity<ErrorResponse> handleDuplicateTransactionException(DuplicateTransactionException ex) {
         log.error("Duplicate transaction: {}", ex.getMessage());
         
-        ErrorResponse errorResponse = ErrorResponse.builder()
-                .timestamp(LocalDateTime.now())
-                .status(HttpStatus.CONFLICT.value())
-                .error(HttpStatus.CONFLICT.getReasonPhrase())
-                .message(ex.getMessage())
-                .path(request.getDescription(false).replace("uri=", ""))
-                .build();
+        ErrorResponse errorResponse = errorCodeProperties.get("DuplicateTransactionException").copy();
+        if (ex.getMessage() != null && !ex.getMessage().isEmpty()) {
+            errorResponse.setErrorReason(ex.getMessage());
+        }
         
-        return ResponseEntity.status(HttpStatus.CONFLICT).body(errorResponse);
+        return errorResponse.toResponseEntity();
     }
 
     @ExceptionHandler(InvalidChannelException.class)
-    public ResponseEntity<ErrorResponse> handleInvalidChannelException(
-            InvalidChannelException ex, WebRequest request) {
+    public ResponseEntity<ErrorResponse> handleInvalidChannelException(InvalidChannelException ex) {
         log.error("Invalid channel: {}", ex.getMessage(), ex);
         
-        ErrorResponse errorResponse = ErrorResponse.builder()
-                .timestamp(LocalDateTime.now())
-                .status(HttpStatus.BAD_REQUEST.value())
-                .error(HttpStatus.BAD_REQUEST.getReasonPhrase())
-                .message(ex.getMessage())
-                .path(request.getDescription(false).replace("uri=", ""))
-                .build();
+        ErrorResponse errorResponse = errorCodeProperties.get("InvalidChannelException").copy();
+        if (ex.getMessage() != null && !ex.getMessage().isEmpty()) {
+            errorResponse.setReasonParameters(ex.getMessage());
+        }
         
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+        return errorResponse.toResponseEntity();
     }
 
     @ExceptionHandler(DepositProcessingException.class)
-    public ResponseEntity<ErrorResponse> handleDepositProcessingException(
-            DepositProcessingException ex, WebRequest request) {
+    public ResponseEntity<ErrorResponse> handleDepositProcessingException(DepositProcessingException ex) {
         log.error("Deposit processing error: {}", ex.getMessage(), ex);
         
-        ErrorResponse errorResponse = ErrorResponse.builder()
-                .timestamp(LocalDateTime.now())
-                .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
-                .error(HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase())
-                .message(ex.getMessage())
-                .path(request.getDescription(false).replace("uri=", ""))
-                .build();
+        ErrorResponse errorResponse = errorCodeProperties.get("DepositProcessingException").copy();
+        if (ex.getMessage() != null && !ex.getMessage().isEmpty()) {
+            errorResponse.setErrorReason(ex.getMessage());
+        }
         
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
+        return errorResponse.toResponseEntity();
     }
 
     @ExceptionHandler(MissingRequestHeaderException.class)
-    public ResponseEntity<ErrorResponse> handleMissingRequestHeaderException(
-            MissingRequestHeaderException ex, WebRequest request) {
+    public ResponseEntity<ErrorResponse> handleMissingRequestHeaderException(MissingRequestHeaderException ex) {
         log.error("Missing required header: {}", ex.getMessage());
         
-        ErrorResponse errorResponse = ErrorResponse.builder()
-                .timestamp(LocalDateTime.now())
-                .status(HttpStatus.BAD_REQUEST.value())
-                .error(HttpStatus.BAD_REQUEST.getReasonPhrase())
-                .message("Missing required header: " + ex.getHeaderName())
-                .path(request.getDescription(false).replace("uri=", ""))
-                .build();
+        ErrorResponse errorResponse = errorCodeProperties.get("MissingRequestHeaderException").copy();
+        errorResponse.setReasonParameters(ex.getHeaderName());
         
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+        return errorResponse.toResponseEntity();
     }
 
     @ExceptionHandler(IllegalArgumentException.class)
-    public ResponseEntity<ErrorResponse> handleIllegalArgumentException(
-            IllegalArgumentException ex, WebRequest request) {
+    public ResponseEntity<ErrorResponse> handleIllegalArgumentException(IllegalArgumentException ex) {
         log.error("Invalid argument: {}", ex.getMessage());
 
-        ErrorResponse errorResponse = ErrorResponse.builder()
-                .timestamp(LocalDateTime.now())
-                .status(HttpStatus.BAD_REQUEST.value())
-                .error(HttpStatus.BAD_REQUEST.getReasonPhrase())
-                .message(ex.getMessage())
-                .path(request.getDescription(false).replace("uri=", ""))
-                .build();
+        ErrorResponse errorResponse = errorCodeProperties.get("IllegalArgumentException").copy();
+        if (ex.getMessage() != null && !ex.getMessage().isEmpty()) {
+            errorResponse.setErrorReason(ex.getMessage());
+        }
         
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+        return errorResponse.toResponseEntity();
     }
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<ErrorResponse> handleGlobalException(
-            Exception ex, WebRequest request) {
+    public ResponseEntity<ErrorResponse> handleGlobalException(Exception ex) {
         log.error("Unexpected error occurred: {}", ex.getMessage(), ex);
         
-        ErrorResponse errorResponse = ErrorResponse.builder()
-                .timestamp(LocalDateTime.now())
-                .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
-                .error(HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase())
-                .message("An unexpected error occurred. Please try again later.")
-                .path(request.getDescription(false).replace("uri=", ""))
-                .build();
+        ErrorResponse errorResponse = errorCodeProperties.get("Exception").copy();
         
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
+        return errorResponse.toResponseEntity();
     }
 }

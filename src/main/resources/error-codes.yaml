@@ -1,0 +1,36 @@
+error-code:
+  InvalidChannelException:
+    statusCode: 400
+    errorCode: "11"
+    errorSource: "CHANNEL_NOT_SUPPORTED"
+    errorReason: "Channel %s is not supported"
+  DuplicateTransactionException:
+    statusCode: 409
+    errorCode: "12"
+    errorSource: "DUPLICATE_TRANSACTION"
+    errorReason: "Duplicate transaction detected"
+  DepositNotFoundException:
+    statusCode: 404
+    errorCode: "13"
+    errorSource: "DEPOSIT_NOT_FOUND"
+    errorReason: "Deposit not found"
+  DepositProcessingException:
+    statusCode: 500
+    errorCode: "14"
+    errorSource: "PROCESSING_ERROR"
+    errorReason: "Error processing deposit transaction"
+  MissingRequestHeaderException:
+    statusCode: 400
+    errorCode: "15"
+    errorSource: "MISSING_REQUIRED_HEADER"
+    errorReason: "Missing required header: %s"
+  IllegalArgumentException:
+    statusCode: 400
+    errorCode: "16"
+    errorSource: "INVALID_ARGUMENT"
+    errorReason: "Invalid argument provided"
+  Exception:
+    statusCode: 500
+    errorCode: "99"
+    errorSource: "INTERNAL_ERROR"
+    errorReason: "An unexpected error occurred. Please try again later."
