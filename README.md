@@ -73,7 +73,25 @@ spring:
 
 The service will start on `http://localhost:2056` by default.
 
-### 3. Test the endpoints
+### 3. Kafka Setup
+```
+docker network create app-tier --driver bridge
+
+docker run -d --name zookeeper-server \
+    --network app-tier \
+    -e ALLOW_ANONYMOUS_LOGIN=yes \
+    bitnami/zookeeper:latest
+
+docker run -d --name kafka-server \
+    --network app-tier \
+    -e ALLOW_PLAINTEXT_LISTENER=yes \
+	-e KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://127.0.0.1:9092 \
+    -e KAFKA_CFG_ZOOKEEPER_CONNECT=zookeeper-server:2181 \
+	-p 9092:9092 \
+    bitnami/kafka:latest
+```
+
+### 4. Test the endpoints
 
 **Create a deposit:**
 
@@ -109,61 +127,6 @@ curl -X POST http://localhost:2056/api/v1/deposits \
     "creditorNotification": {
       "email": "jane.smith@example.com",
       "mobile": "+639189876543"
-    }
-  }'
-```
-
-InstaPay deposit example:
-```bash
-curl -X POST http://localhost:2056/api/v1/deposits \
-  -H "Content-Type: application/json" \
-  -H "channel: instapay" \
-  -H "idempotency-Key: $(uuidgen)" \
-  -H "transaction-id: $(uuidgen)" \
-  -H "request-source: web-app" \
-  -d '{
-    "debtorAccount": {
-      "name": "Alice Johnson",
-      "accountId": "1122334455",
-      "bankCode": "BPI"
-    },
-    "creditorAccount": {
-      "name": "Bob Williams",
-      "accountId": "5544332211",
-      "bankCode": "BDO"
-    },
-    "amount": 5000.00,
-    "currency": "PHP",
-    "additionalData": {
-      "purpose": "Fund transfer"
-    }
-  }'
-```
-
-PESONet deposit example:
-```bash
-curl -X POST http://localhost:2056/api/v1/deposits \
-  -H "Content-Type: application/json" \
-  -H "channel: pesonet" \
-  -H "idempotency-Key: $(uuidgen)" \
-  -H "transaction-id: $(uuidgen)" \
-  -H "request-source: api" \
-  -d '{
-    "debtorAccount": {
-      "name": "Company ABC",
-      "accountId": "9988776655",
-      "bankCode": "MBTC"
-    },
-    "creditorAccount": {
-      "name": "Supplier XYZ",
-      "accountId": "5566778899",
-      "bankCode": "UCPB"
-    },
-    "amount": 25000.00,
-    "currency": "PHP",
-    "additionalData": {
-      "purpose": "Supplier payment",
-      "invoiceNumber": "INV-2024-500"
     }
   }'
 ```
