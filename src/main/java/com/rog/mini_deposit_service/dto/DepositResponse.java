@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.Map;
 
 @Data
 @Builder
@@ -22,4 +23,5 @@ public class DepositResponse {
     private String currency;
     private String status;
     private LocalDateTime timestamp;
+    private Map<String, Object> additionalData;
 }

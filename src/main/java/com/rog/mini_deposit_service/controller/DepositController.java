@@ -35,9 +35,10 @@ public class DepositController {
                 .currency(request.getCurrency())
                 .status("PENDING")
                 .timestamp(LocalDateTime.now())
+                .additionalData(request.getAdditionalData())
                 .build();
 
-        log.info("Created deposit transaction: {} for channel: {}", response.getTransactionId(), channel);
+        log.info("Created deposit transaction, channel={}, responseBody={}", channel, response);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
