@@ -4,3 +4,11 @@ spring:
 
 server:
   port: 2056
+
+channel-properties:
+  intrabank:
+    service: IntrabankService
+  instapay:
+    service: InstapayService
+  pesonet:
+    service: PesonetService
