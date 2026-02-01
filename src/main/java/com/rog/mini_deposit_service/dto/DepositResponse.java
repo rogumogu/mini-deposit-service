@@ -14,6 +14,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class DepositResponse {
     private String transactionId;
+    private String idempotencyKey;
     private String channel;
     private Account debtorAccount;
     private Account creditorAccount;
@@ -21,5 +22,4 @@ public class DepositResponse {
     private String currency;
     private String status;
     private LocalDateTime timestamp;
-    private String message;
 }

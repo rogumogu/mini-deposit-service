@@ -17,14 +17,17 @@ public class DepositController {
 
     @PostMapping
     public ResponseEntity<DepositResponse> createDeposit(
-            @RequestHeader("X-Channel") String channel,
-            @RequestHeader("X-Idempotency-Key") String idempotencyKey,
+            @RequestHeader("channel") String channel,
+            @RequestHeader("idempotency-Key") String idempotencyKey,
+            @RequestHeader("transaction-id") String transactionId,
+            @RequestHeader("request-source") String requestSource,
             @RequestBody DepositRequest request) {
-        log.info("Received deposit request, channel={}, idempotencyKey={}, requestBody={}",
-                channel, idempotencyKey, request);
+        log.info("Received deposit request, channel={}, idempotencyKey={}, transactionId={}, requestSource={}, requestBody={}",
+                channel, idempotencyKey, transactionId, requestSource, request);
 
         DepositResponse response = DepositResponse.builder()
-                .transactionId(UUID.randomUUID().toString())
+                .transactionId(transactionId)
+                .idempotencyKey(idempotencyKey)
                 .channel(channel)
                 .debtorAccount(request.getDebtorAccount())
                 .creditorAccount(request.getCreditorAccount())
@@ -32,7 +35,6 @@ public class DepositController {
                 .currency(request.getCurrency())
                 .status("PENDING")
                 .timestamp(LocalDateTime.now())
-                .message("Deposit request received successfully")
                 .build();
 
         log.info("Created deposit transaction: {} for channel: {}", response.getTransactionId(), channel);
@@ -47,7 +49,6 @@ public class DepositController {
                 .transactionId(transactionId)
                 .status("PENDING")
                 .timestamp(LocalDateTime.now())
-                .message("Deposit transaction found")
                 .build();
 
         return ResponseEntity.ok(response);
