@@ -4,18 +4,19 @@ import com.rog.deposit.dto.DepositRequest;
 import com.rog.deposit.dto.DepositResponse;
 import com.rog.deposit.entity.Deposit;
 import com.rog.deposit.service.IntrabankService;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 @Slf4j
 @Service
-@RequiredArgsConstructor
 public class IntrabankServiceImpl extends BaseDepositService implements IntrabankService {
 
     @Override
     protected DepositResponse processTransaction(Deposit deposit, DepositRequest request) {
         log.info("Processing Intrabank transaction: {}", deposit.getTransactionId());
+        
+        cbsWithdrawTransaction(deposit, request);
+        cbsDepositTransaction(deposit, request);
         
         DepositResponse response = DepositResponse.builder()
                 .transactionId(deposit.getTransactionId())
