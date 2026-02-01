@@ -16,13 +16,18 @@ import java.util.UUID;
 public class DepositController {
 
     @PostMapping
-    public ResponseEntity<DepositResponse> createDeposit(@RequestBody DepositRequest request) {
-        log.info("Received deposit request for account: {}, amount: {}", 
-                request.getAccountId(), request.getAmount());
+    public ResponseEntity<DepositResponse> createDeposit(
+            @RequestHeader("X-Channel") String channel,
+            @RequestHeader("X-Idempotency-Key") String idempotencyKey,
+            @RequestBody DepositRequest request) {
+        log.info("Received deposit request, channel={}, idempotencyKey={}, requestBody={}",
+                channel, idempotencyKey, request);
 
         DepositResponse response = DepositResponse.builder()
                 .transactionId(UUID.randomUUID().toString())
-                .accountId(request.getAccountId())
+                .channel(channel)
+                .debtorAccount(request.getDebtorAccount())
+                .creditorAccount(request.getCreditorAccount())
                 .amount(request.getAmount())
                 .currency(request.getCurrency())
                 .status("PENDING")
@@ -30,7 +35,7 @@ public class DepositController {
                 .message("Deposit request received successfully")
                 .build();
 
-        log.info("Created deposit transaction: {}", response.getTransactionId());
+        log.info("Created deposit transaction: {} for channel: {}", response.getTransactionId(), channel);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 

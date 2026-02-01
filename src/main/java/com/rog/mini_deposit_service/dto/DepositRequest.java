@@ -10,8 +10,11 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 @AllArgsConstructor
 public class DepositRequest {
-    private String accountId;
+    private Account debtorAccount;
+    private Account creditorAccount;
     private BigDecimal amount;
     private String currency;
-    private String description;
+    private String additionalData;
+    private Notification debtorNotification;
+    private Notification creditorNotification;
 }
