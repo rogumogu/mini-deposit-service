@@ -6,6 +6,7 @@ import com.rog.deposit.dto.DepositResponse;
 import com.rog.deposit.dto.instapay.InstapayRequest;
 import com.rog.deposit.dto.instapay.InstapayResponse;
 import com.rog.deposit.entity.Deposit;
+import com.rog.deposit.event.DepositSuccessEvent;
 import com.rog.deposit.service.InstapayService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -39,6 +40,9 @@ public class InstapayServiceImpl extends BaseDepositService implements InstapayS
                 .build();
         
         log.info("InstaPay transaction processed successfully, transactionId={}", deposit.getTransactionId());
+        
+        publishDepositSuccessEvent(deposit, request);
+        
         return response;
     }
 
@@ -56,5 +60,9 @@ public class InstapayServiceImpl extends BaseDepositService implements InstapayS
                 instapayResponse.getReferenceNumber(), instapayResponse.getStatus());
         
         return instapayResponse;
+    }
+
+    public void sendNotification(DepositSuccessEvent event) {
+        log.info("INSTAPAY: Sending notifications for transactionId: {}", event.getTransactionId());
     }
 }

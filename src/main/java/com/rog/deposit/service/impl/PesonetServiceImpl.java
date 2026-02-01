@@ -6,6 +6,7 @@ import com.rog.deposit.dto.DepositResponse;
 import com.rog.deposit.dto.pesonet.PesonetRequest;
 import com.rog.deposit.dto.pesonet.PesonetResponse;
 import com.rog.deposit.entity.Deposit;
+import com.rog.deposit.event.DepositSuccessEvent;
 import com.rog.deposit.service.PesonetService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -39,6 +40,9 @@ public class PesonetServiceImpl extends BaseDepositService implements PesonetSer
                 .build();
         
         log.info("PESONet transaction processed successfully, transactionId={}", deposit.getTransactionId());
+        
+        publishDepositSuccessEvent(deposit, request);
+        
         return response;
     }
 
@@ -56,5 +60,9 @@ public class PesonetServiceImpl extends BaseDepositService implements PesonetSer
                 pesonetResponse.getReferenceNumber(), pesonetResponse.getStatus());
         
         return pesonetResponse;
+    }
+
+    public void sendNotification(DepositSuccessEvent event) {
+        log.info("PESONET: Sending notifications for transactionId: {}", event.getTransactionId());
     }
 }

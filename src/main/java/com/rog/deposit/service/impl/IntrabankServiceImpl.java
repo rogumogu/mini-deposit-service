@@ -3,6 +3,7 @@ package com.rog.deposit.service.impl;
 import com.rog.deposit.dto.DepositRequest;
 import com.rog.deposit.dto.DepositResponse;
 import com.rog.deposit.entity.Deposit;
+import com.rog.deposit.event.DepositSuccessEvent;
 import com.rog.deposit.service.IntrabankService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -32,6 +33,13 @@ public class IntrabankServiceImpl extends BaseDepositService implements Intraban
                 .build();
         
         log.info("Intrabank transaction processed successfully, transactionId={}", deposit.getTransactionId());
+        
+        publishDepositSuccessEvent(deposit, request);
+        
         return response;
+    }
+
+    public void sendNotification(DepositSuccessEvent event) {
+        log.info("INTRABANK: Sending notifications for transactionId: {}", event.getTransactionId());
     }
 }

@@ -8,7 +8,9 @@ import com.rog.deposit.dto.cbs.CbsResponse;
 import com.rog.deposit.dto.cbs.DepositCbsRequest;
 import com.rog.deposit.dto.cbs.WithdrawalCbsRequest;
 import com.rog.deposit.entity.Deposit;
+import com.rog.deposit.event.DepositSuccessEvent;
 import com.rog.deposit.service.DepositCommandService;
+import com.rog.deposit.event.producer.DepositEventPublisher;
 import com.rog.deposit.service.DepositService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +23,7 @@ public abstract class BaseDepositService implements DepositService {
     protected DepositCommandService depositCommandService;
     protected ObjectMapper objectMapper;
     protected CoreBankingClient coreBankingService;
+    protected DepositEventPublisher depositEventProducer;
 
     @Override
     public DepositResponse createDeposit(String transactionId, String idempotencyKey, String channel, DepositRequest request) {
@@ -63,6 +66,24 @@ public abstract class BaseDepositService implements DepositService {
         return depositResponse;
     }
 
+    protected void publishDepositSuccessEvent(Deposit deposit, DepositRequest request) {
+        DepositSuccessEvent event = DepositSuccessEvent.builder()
+                .transactionId(deposit.getTransactionId())
+                .idempotencyKey(deposit.getIdempotencyKey())
+                .channel(deposit.getChannel())
+                .debtorAccount(request.getDebtorAccount())
+                .creditorAccount(request.getCreditorAccount())
+                .amount(deposit.getAmount())
+                .currency(deposit.getCurrency())
+                .status(deposit.getStatus())
+                .additionalData(request.getAdditionalData())
+                .debtorNotification(request.getDebtorNotification())
+                .creditorNotification(request.getCreditorNotification())
+                .build();
+        
+        depositEventProducer.publishDepositSuccess(event);
+    }
+
     @Autowired
     public void setObjectMapper(ObjectMapper objectMapper) {
         this.objectMapper = objectMapper;
@@ -76,6 +97,11 @@ public abstract class BaseDepositService implements DepositService {
     @Autowired
     public void setCoreBankingService(CoreBankingClient coreBankingService) {
         this.coreBankingService = coreBankingService;
+    }
+
+    @Autowired
+    public void setDepositEventProducer(DepositEventPublisher depositEventProducer) {
+        this.depositEventProducer = depositEventProducer;
     }
 
 }
