@@ -1,3 +1,6 @@
 spring:
   application:
     name: mini-deposit-service
+
+server:
+  port: 2056
